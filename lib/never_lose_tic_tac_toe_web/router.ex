@@ -19,6 +19,7 @@ defmodule NeverLoseTicTacToeWeb.Router do
 
     get "/", PageController, :index
     live "/clock", ClockLive
+    live "/never_lose_tic_tac_toe", NeverLoseTicTacToeLive
   end
 
   # Other scopes may use custom stacks.
