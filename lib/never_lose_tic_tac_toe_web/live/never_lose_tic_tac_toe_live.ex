@@ -34,43 +34,66 @@ defmodule NeverLoseTicTacToeWeb.NeverLoseTicTacToeLive do
     <div>
       <div class="note"> O - Computer | X - You </div>
       <div id="game-board">
-      <%= raw @board %>
+      <%= raw @board_html %>
       </div>
     </div>
     """
   end
 
   def mount(_session, socket) do
-    {:ok, put_data(socket, "3x3")}
+    {:ok, update_socket(socket, board_from_board_size("3x3"))}
   end
 
-  def handle_event("board-size-choose", board, socket) do
-    {:noreply, put_data(socket, board)}
+  def handle_event("human-click", cell_index, %{assigns: %{board: board}} = socket) do
+    [x, y] = String.split(cell_index, "x") |> Enum.map(&String.to_integer(&1))
+    new_row = board |> Enum.at(x) |> List.replace_at(y, "1")
+    new_board = board |> List.replace_at(x, new_row)
+
+    {:noreply, update_socket(socket, new_board)}
   end
 
-  defp put_data(socket, board) do
-    board =
-      case board do
-        "3x3" -> @board_3_x_3
-        "4x4" -> @board_4_x_4
-        "5x5" -> @board_5_x_5
-      end
-
-    assign(socket, :board, build_board(board))
+  def handle_event("board-size-choose", board_size, socket) do
+    {:noreply, update_socket(socket, board_from_board_size(board_size))}
   end
 
-  defp build_board(board) do
-    rows =
-      Enum.reduce(board, "", fn row, rows ->
-        columns =
-          Enum.reduce(row, "", fn
-            "0", columns -> "<td>0</td>" <> columns
-            cell, columns -> "<td></td>" <> columns
+  defp update_socket(socket, board) do
+    socket
+    |> assign(:board_html, build_board_html(board))
+    |> assign(:board, board)
+  end
+
+  defp board_from_board_size("3x3"), do: @board_3_x_3
+  defp board_from_board_size("4x4"), do: @board_4_x_4
+  defp board_from_board_size("5x5"), do: @board_5_x_5
+
+  defp build_board_html(board) do
+    {rows, _} =
+      Enum.reduce(board, {"", 0}, fn row, {rows, row_index} ->
+        {columns, _} =
+          Enum.reduce(row, {"", 0}, fn
+            "0", {columns, column_index} -> row(columns, row_index, column_index, "O")
+            "1", {columns, column_index} -> row(columns, row_index, column_index, "X")
+            "x", {columns, column_index} -> row(columns, row_index, column_index)
           end)
 
-        "<tr>#{columns}</tr>" <> rows
+        {rows <> "<tr>#{columns}</tr>", row_index + 1}
       end)
 
     "<table> #{rows} </table>"
+  end
+
+  defp row(columns, row_index, column_index) do
+    {
+      columns <>
+        "<td class=\"cell\"><button value=\"#{row_index}x#{column_index}\" phx-click=\"human-click\"></button></td>",
+      column_index + 1
+    }
+  end
+
+  defp row(columns, row_index, column_index, cell_value) do
+    {
+      columns <> "<td class=\"cell\" value=\"#{row_index}x#{column_index}\">#{cell_value}</td>",
+      column_index + 1
+    }
   end
 end
