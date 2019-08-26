@@ -44,10 +44,11 @@ defmodule NeverLoseTicTacToeWeb.NeverLoseTicTacToeLive do
     {:ok, update_socket(socket, board_from_board_size("3x3"))}
   end
 
-  def handle_event("human-click", cell_index, %{assigns: %{board: board}} = socket) do
-    [x, y] = String.split(cell_index, "x") |> Enum.map(&String.to_integer(&1))
-    new_row = board |> Enum.at(x) |> List.replace_at(y, "1")
-    new_board = board |> List.replace_at(x, new_row)
+  def handle_event("human-move", cell_index, %{assigns: %{board: board}} = socket) do
+    new_board =
+      board
+      |> update_human_move(cell_index)
+      |> update_computer_move()
 
     {:noreply, update_socket(socket, new_board)}
   end
@@ -85,7 +86,7 @@ defmodule NeverLoseTicTacToeWeb.NeverLoseTicTacToeLive do
   defp row(columns, row_index, column_index) do
     {
       columns <>
-        "<td class=\"cell\"><button value=\"#{row_index}x#{column_index}\" phx-click=\"human-click\"></button></td>",
+        "<td class=\"cell\"><button value=\"#{row_index}x#{column_index}\" phx-click=\"human-move\"></button></td>",
       column_index + 1
     }
   end
@@ -95,5 +96,20 @@ defmodule NeverLoseTicTacToeWeb.NeverLoseTicTacToeLive do
       columns <> "<td class=\"cell\" value=\"#{row_index}x#{column_index}\">#{cell_value}</td>",
       column_index + 1
     }
+  end
+
+  defp replace_element_in_board(board, [x, y], text_to_replace) do
+    new_row = board |> Enum.at(x) |> List.replace_at(y, text_to_replace)
+    board |> List.replace_at(x, new_row)
+  end
+
+  defp handle_human_move(board, cell_index) do
+    [x, y] = String.split(cell_index, "x") |> Enum.map(&String.to_integer(&1))
+    replace_element_in_board(board, [x, y], "1")
+  end
+
+  defp update_computer_move(board, cell_index) do
+    [x, y] = find_next_possible_winning_move(board)
+    replace_element_in_board(board, [x, y], "O")
   end
 end
