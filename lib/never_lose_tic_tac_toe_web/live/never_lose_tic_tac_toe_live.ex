@@ -92,15 +92,15 @@ defmodule NeverLoseTicTacToeWeb.NeverLoseTicTacToeLive do
   end
 
   defp cell_index(cell_index) do
-    String.split(cell_index, "x") |> Enum.map(&String.to_integer(&1))
+    String.split(cell_index, "x") |> Enum.map(&String.to_integer(&1)) |> List.to_tuple()
   end
 
-  defp replace_element_in_board(board, [x, y], text_to_replace) do
+  defp replace_element_in_board(board, {_, :not_found}, _text_to_replace), do: board
+
+  defp replace_element_in_board(board, {x, y}, text_to_replace) do
     new_row = board |> Enum.at(x) |> List.replace_at(y, text_to_replace)
     board |> List.replace_at(x, new_row)
   end
-
-  defp replace_element_in_board(board, [_, false], _text_to_replace), do: board
 
   defp handle_human_move(board, cell_index) do
     replace_element_in_board(board, cell_index, "1")
@@ -116,7 +116,7 @@ defmodule NeverLoseTicTacToeWeb.NeverLoseTicTacToeLive do
 
     Enum.reduce(x_cells, {[], 0, 0}, fn
       "x", {free_cells, index, human_entries} ->
-        {[[x, index] | free_cells], index + 1, human_entries}
+        {[{x, index} | free_cells], index + 1, human_entries}
 
       "1", {free_cells, index, human_entries} ->
         {free_cells, index + 1, human_entries + 1}
@@ -131,7 +131,7 @@ defmodule NeverLoseTicTacToeWeb.NeverLoseTicTacToeLive do
       x_cells, {free_cells, index, human_entries} ->
         case Enum.at(x_cells, y) do
           "x" ->
-            {[[index, y] | free_cells], index + 1, human_entries}
+            {[{index, y} | free_cells], index + 1, human_entries}
 
           "1" ->
             {free_cells, index + 1, human_entries + 1}
@@ -143,18 +143,18 @@ defmodule NeverLoseTicTacToeWeb.NeverLoseTicTacToeLive do
   end
 
   defp free_cell_index(board) do
-    Enum.reduce_while(board, [0, false], fn row, [x, _] ->
+    Enum.reduce_while(board, {0, :not_found}, fn row, {x, _} ->
       {y_found, y} =
         Enum.reduce_while(row, {true, 0}, fn
-          "x", {_, index} -> {:halt, {true, index}}
-          _, {_, index} -> {:cont, {false, index + 1}}
+          "x", {_, index} -> {:halt, {:found, index}}
+          _, {_, index} -> {:cont, {:not_found, index + 1}}
         end)
 
-      if y_found, do: {:halt, [x, y]}, else: {:cont, [x + 1, false]}
+      if y_found == :found, do: {:halt, {x, y}}, else: {:cont, {x + 1, :not_found}}
     end)
   end
 
-  defp find_next_possible_winning_move(board, [x, y]) do
+  defp find_next_possible_winning_move(board, {x, y}) do
     {x_free_cells, _, x_human_entries} = x_cell_to_block(board, x)
     {y_free_cells, _, y_human_entries} = y_cell_to_block(board, y)
 
