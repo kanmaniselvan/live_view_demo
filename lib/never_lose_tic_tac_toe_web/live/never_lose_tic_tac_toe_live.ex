@@ -16,7 +16,7 @@ defmodule NeverLoseTicTacToeWeb.NeverLoseTicTacToeLive do
     ~w(x x x x x)
   ]
 
-  def render(assigns) do
+  def render(%{game_state: :playing} = assigns) do
     ~L"""
     <div>
     <h1>Select board size </h1>
@@ -32,8 +32,42 @@ defmodule NeverLoseTicTacToeWeb.NeverLoseTicTacToeLive do
     """
   end
 
+  def render(%{game_state: :game_draw} = assigns) do
+    ~L"""
+    <div>
+    <h1>Select board size </h1>
+    <h1>The game draw</h1>
+     <button phx-click="board-size-choose" value="3x3">3 x 3</button>
+     <button phx-click="board-size-choose" value="5x5">5 x 5</button>
+    </div>
+    <div>
+      <div class="note"> O - Computer | X - You </div>
+      <div id="game-board">
+      <%= raw @board_html %>
+      </div>
+    </div>
+    """
+  end
+
+  def render(%{game_state: :computer_won} = assigns) do
+    ~L"""
+    <div>
+    <h1>Select board size </h1>
+    <h1>Computer won</h1>
+     <button phx-click="board-size-choose" value="3x3">3 x 3</button>
+     <button phx-click="board-size-choose" value="5x5">5 x 5</button>
+    </div>
+    <div>
+      <div class="note"> O - Computer | X - You </div>
+      <div id="game-board">
+      <%= raw @board_html %>
+      </div>
+    </div>
+    """
+  end
+
   def mount(_session, socket) do
-    {:ok, update_socket(socket, board_from_board_size("3x3"))}
+    {:ok, update_socket(socket, board_from_board_size("3x3"), {:playing, []})}
   end
 
   def handle_event("human-move", cell_index_string, %{assigns: %{board: board}} = socket) do
@@ -44,15 +78,17 @@ defmodule NeverLoseTicTacToeWeb.NeverLoseTicTacToeLive do
       |> handle_human_move(cell_index)
       |> handle_computer_move(cell_index)
 
-    {:noreply, update_socket(socket, new_board)}
+    {:noreply, update_socket(socket, new_board, game_status(new_board))}
   end
 
   def handle_event("board-size-choose", board_size, socket) do
-    {:noreply, update_socket(socket, board_from_board_size(board_size))}
+    {:noreply, update_socket(socket, board_from_board_size(board_size), {:playing, []})}
   end
 
-  defp update_socket(socket, board) do
+  defp update_socket(socket, board, {game_state, won_cells}) do
     socket
+    |> assign(:game_state, game_state)
+    |> assign(:won_cells, won_cells)
     |> assign(:board_html, build_board_html(board))
     |> assign(:board, board)
   end
@@ -167,6 +203,94 @@ defmodule NeverLoseTicTacToeWeb.NeverLoseTicTacToeLive do
 
       true ->
         free_cell_index(board)
+    end
+  end
+
+  defp update_in_tuple_1({elem_1, elem_2, y}, elem) do
+    {[elem | elem_1], elem_2, y}
+  end
+
+  defp update_in_tuple_2({elem_1, elem_2, y}, elem) do
+    {elem_1, [elem | elem_2], y}
+  end
+
+  defp detect_computer_won_x_and_xy_cells(board) do
+    board_size = Enum.count(board)
+
+    Enum.reduce_while(board, {:not_found, [], [], 0}, fn row, {_, _x_cells, xy_cells, x} ->
+      {x_cells, xy_cells, _index} =
+        Enum.reduce(row, {[], xy_cells, 0}, fn
+          "0", {x_cells, xy_cells, y} ->
+            if x == y do
+              {x_cells, xy_cells, y + 1} |> update_in_tuple_1({x, y}) |> update_in_tuple_2({x, y})
+            else
+              {x_cells, xy_cells, y + 1} |> update_in_tuple_1({x, y})
+            end
+
+          _, {x_cells, xy_cells, y} ->
+            {x_cells, xy_cells, y + 1}
+        end)
+
+      cond do
+        Enum.count(x_cells) == board_size -> {:halt, {:found, x_cells}}
+        Enum.count(xy_cells) == board_size -> {:halt, {:found, xy_cells}}
+        true -> {:cont, {:not_found, x_cells, xy_cells, x + 1}}
+      end
+    end)
+  end
+
+  defp detect_computer_won_y_and_yx_cells(board) do
+    board_size = Enum.count(board)
+    end_index = board_size - 1
+
+    Enum.reduce_while(0..end_index, {:not_found, [], [], end_index}, fn x,
+                                                                        {_, y_cells, yx_cells, yx} ->
+      {y_cells, yx_cells, _index} =
+        Enum.reduce(board, {y_cells, yx_cells, 0}, fn rows, {y_cells, yx_cells, y} ->
+          if Enum.at(rows, x) == "0" do
+            if Enum.at(rows, yx) == "0" do
+              {y_cells, yx_cells, y + 1} |> update_in_tuple_1({x, y}) |> update_in_tuple_2({x, y})
+            else
+              {y_cells, yx_cells, y + 1} |> update_in_tuple_1({x, y})
+            end
+          else
+            {y_cells, yx_cells, y + 1}
+          end
+        end)
+
+      cond do
+        Enum.count(y_cells) == board_size -> {:halt, {:found, y_cells}}
+        Enum.count(yx_cells) == board_size -> {:halt, {:found, yx_cells}}
+        true -> {:cont, {:not_found, y_cells, yx_cells, yx - 1}}
+      end
+    end)
+  end
+
+  defp computer_won(board) do
+    with {:found, won_cells} <- detect_computer_won_x_and_xy_cells(board) do
+      {:ok, won_cells}
+    else
+      _ ->
+        with {:found, won_cells} <- detect_computer_won_y_and_yx_cells(board) do
+          {:ok, won_cells}
+        else
+          _ -> {:not_found, []}
+        end
+    end
+  end
+
+  defp game_draw({_, :not_found}), do: true
+  defp game_draw({_, _}), do: false
+
+  defp game_status(board) do
+    with {:ok, won_cells} <- computer_won(board) do
+      {:computer_won, won_cells}
+    else
+      _ ->
+        cond do
+          board |> free_cell_index |> game_draw -> {:game_draw, []}
+          true -> {:playing, []}
+        end
     end
   end
 end
