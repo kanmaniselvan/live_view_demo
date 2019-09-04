@@ -1,5 +1,9 @@
-<section class="phx-hero">  
-  <h1>My Phrenzy Entry</h1>
-  <p><%= link "This clock", to: Routes.live_path(@conn, NeverLoseTicTacToeWeb.ClockLive) %> is a basic live view in action.</p>
-  <p><%= link "This tic tack toe", to: Routes.live_path(@conn, NeverLoseTicTacToeWeb.NeverLoseTicTacToeLive) %> is where never lose tick tac toe lives.</p>
-</section>
+<div class="foot-note">
+  <h1>A <strong>Tic Tak Toe</strong> game that <span>never lets you win</span>.</h1>
+
+  <h1>* <strong>O</strong> - Computer | <strong>X</strong> - You</h1>
+</div>
+
+<div class="live-view-cont">
+  <%= live_render @conn, NeverLoseTicTacToeWeb.NeverLoseTicTacToeLive %>
+</div>

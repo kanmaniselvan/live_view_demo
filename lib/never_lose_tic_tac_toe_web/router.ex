@@ -18,7 +18,6 @@ defmodule NeverLoseTicTacToeWeb.Router do
     pipe_through :browser
 
     get "/", PageController, :index
-    live "/clock", ClockLive
     live "/never_lose_tic_tac_toe", NeverLoseTicTacToeLive
   end
 

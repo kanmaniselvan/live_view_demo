@@ -26,18 +26,22 @@ defmodule NeverLoseTicTacToeWeb.NeverLoseTicTacToeLive do
     ~w(x x x x x x x)
   ]
 
-  def render(%{game_state: :playing} = assigns) do
-    ~L"""
-    <div>
-    <h1>Select board size </h1>
+  defp board_select_html() do
+    """
+    <div class="board-select-cont">    
       <button phx-click="board-size-choose" value="3x3">3 x 3</button>
       <button phx-click="board-size-choose" value="5x5">5 x 5</button>
       <button phx-click="board-size-choose" value="7x7">7 x 7</button>
-    </div>
+    </div>  
+    """
+  end
+
+  def render(%{game_state: :playing} = assigns) do
+    ~L"""
     <div>
-      <div class="note"> O - Computer | X - You </div>
+      <%= raw board_select_html() %>
       <div id="game-board">
-      <%= raw @board_html %>
+        <%= raw @board_html %>
       </div>
     </div>
     """
@@ -46,16 +50,9 @@ defmodule NeverLoseTicTacToeWeb.NeverLoseTicTacToeLive do
   def render(%{game_state: :game_draw} = assigns) do
     ~L"""
     <div>
-    <h1>Select board size </h1>
-    <h1>The game draw</h1>
-      <button phx-click="board-size-choose" value="3x3">3 x 3</button>
-      <button phx-click="board-size-choose" value="5x5">5 x 5</button>
-      <button phx-click="board-size-choose" value="7x7">7 x 7</button>
-    </div>
-    <div>
-      <div class="note"> O - Computer | X - You </div>
+      <%= raw board_select_html() %>
       <div id="game-board">
-      <%= raw @board_html %>
+        <%= raw @board_html %>
       </div>
     </div>
     """
@@ -64,16 +61,9 @@ defmodule NeverLoseTicTacToeWeb.NeverLoseTicTacToeLive do
   def render(%{game_state: :computer_won} = assigns) do
     ~L"""
     <div>
-    <h1>Select board size </h1>
-    <h1>Computer won</h1>
-      <button phx-click="board-size-choose" value="3x3">3 x 3</button>
-      <button phx-click="board-size-choose" value="5x5">5 x 5</button>
-      <button phx-click="board-size-choose" value="7x7">7 x 7</button>
-    </div>
-    <div>
-      <div class="note"> O - Computer | X - You </div>
-      <div id="game-board">
-      <%= raw @board_html %>
+      <%= raw board_select_html() %>
+      <div id="game-board">4
+        <%= raw @board_html %>
       </div>
     </div>
     """
