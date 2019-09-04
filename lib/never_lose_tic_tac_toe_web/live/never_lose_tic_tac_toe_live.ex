@@ -62,7 +62,7 @@ defmodule NeverLoseTicTacToeWeb.NeverLoseTicTacToeLive do
     ~L"""
     <div>
       <%= raw board_select_html() %>
-      <div id="game-board">4
+      <div id="game-board">
         <%= raw @board_html %>
       </div>
     </div>
