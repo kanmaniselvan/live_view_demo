@@ -36,7 +36,6 @@ defmodule NeverLoseTicTacToeWeb.NeverLoseTicTacToeLive do
     """
   end
 
-
   defp board_select_html(_) do
     """
     <div class="board-select-cont">
