@@ -2,6 +2,7 @@ defmodule NeverLoseTicTacToeWeb.Endpoint do
   use Phoenix.Endpoint, otp_app: :never_lose_tic_tac_toe
 
   socket "/socket", NeverLoseTicTacToeWeb.UserSocket,
+    websocket: [timeout: 45_000],
     websocket: true,
     longpoll: false
 
