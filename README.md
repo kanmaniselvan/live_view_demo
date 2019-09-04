@@ -4,7 +4,7 @@ This is my entry in [Phoenix Phrenzy](https://phoenixphrenzy.com), showing off w
 
 Normal Tic Tac Toe game but how hard you try, you can either lose or draw the game. The computer never lets you win.
 
-## Play the game <a href="https://kosher-frugal-leopardseal.gigalixir.com/tic_tac_toe/game.html">here</a>
+## Play the game <a href="https://sheltered-spire-11053.herokuapp.com/">here</a>
 
 # Demo
 
