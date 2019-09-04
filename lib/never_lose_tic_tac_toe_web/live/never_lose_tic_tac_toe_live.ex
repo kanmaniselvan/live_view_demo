@@ -16,12 +16,23 @@ defmodule NeverLoseTicTacToeWeb.NeverLoseTicTacToeLive do
     ~w(x x x x x)
   ]
 
+  @board_7_x_7 [
+    ~w(x x x x x x x),
+    ~w(x x x x x x x),
+    ~w(x x x x x x x),
+    ~w(x x x 0 x x x),
+    ~w(x x x x x x x),
+    ~w(x x x x x x x),
+    ~w(x x x x x x x)
+  ]
+
   def render(%{game_state: :playing} = assigns) do
     ~L"""
     <div>
     <h1>Select board size </h1>
-     <button phx-click="board-size-choose" value="3x3">3 x 3</button>
-     <button phx-click="board-size-choose" value="5x5">5 x 5</button>
+      <button phx-click="board-size-choose" value="3x3">3 x 3</button>
+      <button phx-click="board-size-choose" value="5x5">5 x 5</button>
+      <button phx-click="board-size-choose" value="7x7">7 x 7</button>
     </div>
     <div>
       <div class="note"> O - Computer | X - You </div>
@@ -37,8 +48,9 @@ defmodule NeverLoseTicTacToeWeb.NeverLoseTicTacToeLive do
     <div>
     <h1>Select board size </h1>
     <h1>The game draw</h1>
-     <button phx-click="board-size-choose" value="3x3">3 x 3</button>
-     <button phx-click="board-size-choose" value="5x5">5 x 5</button>
+      <button phx-click="board-size-choose" value="3x3">3 x 3</button>
+      <button phx-click="board-size-choose" value="5x5">5 x 5</button>
+      <button phx-click="board-size-choose" value="7x7">7 x 7</button>
     </div>
     <div>
       <div class="note"> O - Computer | X - You </div>
@@ -54,8 +66,9 @@ defmodule NeverLoseTicTacToeWeb.NeverLoseTicTacToeLive do
     <div>
     <h1>Select board size </h1>
     <h1>Computer won</h1>
-     <button phx-click="board-size-choose" value="3x3">3 x 3</button>
-     <button phx-click="board-size-choose" value="5x5">5 x 5</button>
+      <button phx-click="board-size-choose" value="3x3">3 x 3</button>
+      <button phx-click="board-size-choose" value="5x5">5 x 5</button>
+      <button phx-click="board-size-choose" value="7x7">7 x 7</button>
     </div>
     <div>
       <div class="note"> O - Computer | X - You </div>
@@ -95,6 +108,7 @@ defmodule NeverLoseTicTacToeWeb.NeverLoseTicTacToeLive do
 
   defp board_from_board_size("3x3"), do: @board_3_x_3
   defp board_from_board_size("5x5"), do: @board_5_x_5
+  defp board_from_board_size("7x7"), do: @board_7_x_7
 
   defp build_board_html(board) do
     {rows, _} =
@@ -206,72 +220,90 @@ defmodule NeverLoseTicTacToeWeb.NeverLoseTicTacToeLive do
     end
   end
 
-  defp update_in_tuple_1({elem_1, elem_2, y}, elem) do
-    {[elem | elem_1], elem_2, y}
+  defp update_in_elem_1({elem_1, elem_2, elem_3, y}, elem) do
+    {[elem | elem_1], elem_2, elem_3, y}
   end
 
-  defp update_in_tuple_2({elem_1, elem_2, y}, elem) do
-    {elem_1, [elem | elem_2], y}
+  defp update_in_elem_2({elem_1, elem_2, elem_3, y}, elem) do
+    {elem_1, [elem | elem_2], elem_3, y}
   end
 
-  defp detect_computer_won_x_and_xy_cells(board) do
+  defp update_in_elem_3({elem_1, elem_2, elem_3, y}, elem) do
+    {elem_1, elem_2, [elem | elem_3], y}
+  end
+
+  defp detect_computer_won_x_and_xy_and_yx_cells(board) do
     board_size = Enum.count(board)
+    end_index = board_size - 1
 
-    Enum.reduce_while(board, {:not_found, [], [], 0}, fn row, {_, _x_cells, xy_cells, x} ->
-      {x_cells, xy_cells, _index} =
-        Enum.reduce(row, {[], xy_cells, 0}, fn
-          "0", {x_cells, xy_cells, y} ->
-            if x == y do
-              {x_cells, xy_cells, y + 1} |> update_in_tuple_1({x, y}) |> update_in_tuple_2({x, y})
-            else
-              {x_cells, xy_cells, y + 1} |> update_in_tuple_1({x, y})
+    Enum.reduce_while(board, {:not_found, [], [], [], 0, end_index}, fn row,
+                                                                        {_, _x_cells, xy_cells,
+                                                                         yx_cells, x, yx} ->
+      {x_cells, xy_cells, yx_cells, _index} =
+        Enum.reduce(row, {[], xy_cells, yx_cells, 0}, fn
+          "0", {x_cells, xy_cells, yx_cells, y} ->
+            cond do
+              x == y && y == yx ->
+                {x_cells, xy_cells, yx_cells, y + 1}
+                |> update_in_elem_1({x, y})
+                |> update_in_elem_2({x, y})
+                |> update_in_elem_3({x, y})
+
+              x == y ->
+                {x_cells, xy_cells, yx_cells, y + 1}
+                |> update_in_elem_1({x, y})
+                |> update_in_elem_2({x, y})
+
+              y == yx ->
+                {x_cells, xy_cells, yx_cells, y + 1}
+                |> update_in_elem_1({x, y})
+                |> update_in_elem_3({x, y})
+
+              true ->
+                {x_cells, xy_cells, yx_cells, y + 1}
+                |> update_in_elem_1({x, y})
             end
 
-          _, {x_cells, xy_cells, y} ->
-            {x_cells, xy_cells, y + 1}
+          _, {x_cells, xy_cells, yx_cells, y} ->
+            {x_cells, xy_cells, yx_cells, y + 1}
         end)
 
       cond do
         Enum.count(x_cells) == board_size -> {:halt, {:found, x_cells}}
         Enum.count(xy_cells) == board_size -> {:halt, {:found, xy_cells}}
-        true -> {:cont, {:not_found, x_cells, xy_cells, x + 1}}
+        Enum.count(yx_cells) == board_size -> {:halt, {:found, yx_cells}}
+        true -> {:cont, {:not_found, [], xy_cells, yx_cells, x + 1, yx - 1}}
       end
     end)
   end
 
-  defp detect_computer_won_y_and_yx_cells(board) do
+  defp detect_computer_won_y_cells(board) do
     board_size = Enum.count(board)
     end_index = board_size - 1
 
-    Enum.reduce_while(0..end_index, {:not_found, [], [], end_index}, fn x,
-                                                                        {_, y_cells, yx_cells, yx} ->
-      {y_cells, yx_cells, _index} =
-        Enum.reduce(board, {y_cells, yx_cells, 0}, fn rows, {y_cells, yx_cells, y} ->
+    Enum.reduce_while(0..end_index, {:not_found, []}, fn x, {_, _y_cells} ->
+      {y_cells, _y_index} =
+        Enum.reduce(board, {[], 0}, fn rows, {y_cells, y} ->
           if Enum.at(rows, x) == "0" do
-            if Enum.at(rows, yx) == "0" do
-              {y_cells, yx_cells, y + 1} |> update_in_tuple_1({x, y}) |> update_in_tuple_2({x, y})
-            else
-              {y_cells, yx_cells, y + 1} |> update_in_tuple_1({x, y})
-            end
+            {[{x, y} | y_cells], y + 1}
           else
-            {y_cells, yx_cells, y + 1}
+            {y_cells, y + 1}
           end
         end)
 
       cond do
         Enum.count(y_cells) == board_size -> {:halt, {:found, y_cells}}
-        Enum.count(yx_cells) == board_size -> {:halt, {:found, yx_cells}}
-        true -> {:cont, {:not_found, y_cells, yx_cells, yx - 1}}
+        true -> {:cont, {:not_found, []}}
       end
     end)
   end
 
   defp computer_won(board) do
-    with {:found, won_cells} <- detect_computer_won_x_and_xy_cells(board) do
+    with {:found, won_cells} <- detect_computer_won_x_and_xy_and_yx_cells(board) do
       {:ok, won_cells}
     else
       _ ->
-        with {:found, won_cells} <- detect_computer_won_y_and_yx_cells(board) do
+        with {:found, won_cells} <- detect_computer_won_y_cells(board) do
           {:ok, won_cells}
         else
           _ -> {:not_found, []}
