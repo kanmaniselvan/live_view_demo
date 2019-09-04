@@ -26,9 +26,9 @@ defmodule NeverLoseTicTacToeWeb.NeverLoseTicTacToeLive do
     ~w(x x x x x x x)
   ]
 
-  defp board_select_html() do
+  defp board_select_html(:playing) do
     """
-    <div class="board-select-cont">    
+    <div class="board-select-cont">
       <button phx-click="board-size-choose" value="3x3">3 x 3</button>
       <button phx-click="board-size-choose" value="5x5">5 x 5</button>
       <button phx-click="board-size-choose" value="7x7">7 x 7</button>
@@ -36,21 +36,22 @@ defmodule NeverLoseTicTacToeWeb.NeverLoseTicTacToeLive do
     """
   end
 
-  def render(%{game_state: :playing} = assigns) do
-    ~L"""
-    <div>
-      <%= raw board_select_html() %>
-      <div id="game-board">
-        <%= raw @board_html %>
-      </div>
-    </div>
+
+  defp board_select_html(_) do
+    """
+    <div class="board-select-cont">
+      <button class="glow-button" phx-click="board-size-choose" value="3x3">3 x 3</button>
+      <button class="glow-button" phx-click="board-size-choose" value="5x5">5 x 5</button>
+      <button class="glow-button" phx-click="board-size-choose" value="7x7">7 x 7</button>
+    </div>  
     """
   end
 
   def render(%{game_state: :game_draw} = assigns) do
     ~L"""
     <div>
-      <%= raw board_select_html() %>
+      <%= raw board_select_html(:game_draw) %>
+      <h1 class="game-status draw-game"><strong> Draw game </strong></h1>
       <div id="game-board">
         <%= raw @board_html %>
       </div>
@@ -61,7 +62,19 @@ defmodule NeverLoseTicTacToeWeb.NeverLoseTicTacToeLive do
   def render(%{game_state: :computer_won} = assigns) do
     ~L"""
     <div>
-      <%= raw board_select_html() %>
+      <%= raw board_select_html(:computer_won) %>
+      <h1 class="game-status won-cell"><strong> Computer Won </strong></h1>
+      <div id="game-board">
+        <%= raw @board_html %>
+      </div>
+    </div>
+    """
+  end
+
+  def render(%{game_state: :playing} = assigns) do
+    ~L"""
+    <div>
+      <%= raw board_select_html(:playing) %>
       <div id="game-board">
         <%= raw @board_html %>
       </div>
@@ -92,7 +105,7 @@ defmodule NeverLoseTicTacToeWeb.NeverLoseTicTacToeLive do
     socket
     |> assign(:game_state, game_state)
     |> assign(:won_cells, won_cells)
-    |> assign(:board_html, build_board_html(board))
+    |> assign(:board_html, build_board_html(board, game_state, won_cells))
     |> assign(:board, board)
   end
 
@@ -100,34 +113,47 @@ defmodule NeverLoseTicTacToeWeb.NeverLoseTicTacToeLive do
   defp board_from_board_size("5x5"), do: @board_5_x_5
   defp board_from_board_size("7x7"), do: @board_7_x_7
 
-  defp build_board_html(board) do
+  defp build_board_html(board, game_state, won_cells) do
     {rows, _} =
-      Enum.reduce(board, {"", 0}, fn row, {rows, row_index} ->
+      Enum.reduce(board, {"", 0}, fn row, {rows, x} ->
         {columns, _} =
           Enum.reduce(row, {"", 0}, fn
-            "0", {columns, column_index} -> row(columns, row_index, column_index, "O")
-            "1", {columns, column_index} -> row(columns, row_index, column_index, "X")
-            "x", {columns, column_index} -> row(columns, row_index, column_index)
+            "0", {columns, y} -> row(game_state, columns, won_cells, {x, y}, "O")
+            "1", {columns, y} -> row(game_state, columns, won_cells, {x, y}, "X")
+            "x", {columns, y} -> row(game_state, columns, won_cells, {x, y})
           end)
 
-        {rows <> "<tr>#{columns}</tr>", row_index + 1}
+        {rows <> "<tr>#{columns}</tr>", x + 1}
       end)
 
     "<table> #{rows} </table>"
   end
 
-  defp row(columns, row_index, column_index) do
+  defp row(:computer_won, columns, won_cells, {x, y}) do
+    row(:computer_won, columns, won_cells, {x, y}, "")
+  end
+
+  defp row(_game_state, columns, _won_cells, {x, y}) do
     {
       columns <>
-        "<td class=\"cell\"><button value=\"#{row_index}x#{column_index}\" phx-click=\"human-move\"></button></td>",
-      column_index + 1
+        "<td class=\"cell\"><button value=\"#{x}x#{y}\" phx-click=\"human-move\"></button></td>",
+      y + 1
     }
   end
 
-  defp row(columns, row_index, column_index, cell_value) do
+  defp row(:computer_won, columns, won_cells, {x, y}, cell_value) do
+    cell_class = if Enum.member?(won_cells, {x, y}), do: "won-cell", else: "cell"
+
     {
-      columns <> "<td class=\"cell\" value=\"#{row_index}x#{column_index}\">#{cell_value}</td>",
-      column_index + 1
+      columns <> "<td class=\"#{cell_class}\" value=\"#{x}x#{y}\">#{cell_value}</td>",
+      y + 1
+    }
+  end
+
+  defp row(_game_state, columns, _won_cells, {x, y}, cell_value) do
+    {
+      columns <> "<td class=\"cell\" value=\"#{x}x#{y}\">#{cell_value}</td>",
+      y + 1
     }
   end
 
@@ -275,7 +301,7 @@ defmodule NeverLoseTicTacToeWeb.NeverLoseTicTacToeLive do
       {y_cells, _y_index} =
         Enum.reduce(board, {[], 0}, fn rows, {y_cells, y} ->
           if Enum.at(rows, x) == "0" do
-            {[{x, y} | y_cells], y + 1}
+            {[{y, x} | y_cells], y + 1}
           else
             {y_cells, y + 1}
           end

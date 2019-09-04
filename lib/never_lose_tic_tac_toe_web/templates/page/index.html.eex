@@ -1,7 +1,7 @@
 <div class="head-note">
-  <h1>A <strong>Tic Tak Toe</strong> game that <span>never lets you win</span>.</h1>
+  <h1>A <strong>Tic Tac Toe</strong> game that <span>never lets you win</span>.</h1>
 
-  <h1>* <strong>O</strong> - Computer | <strong>X</strong> - You</h1>
+  <h3>* <strong>O</strong> - Computer | <strong>X</strong> - You</h3>
 </div>
 
 <div class="live-view-cont">
@@ -9,5 +9,5 @@
 </div>
 
 <div class="foot-note">
-  ~ @kanmaniselvan <span style="color: red">|></span> <a href="https://github.com/kanmaniselvan" target="_blank">github</a> | <a href="https://twitter.com/kanmaniselvan" target="_blank">twitter</a> | <a href="https://linkedin.com/in/kanmaniselvan" target="_blank">linkedIn</a> | <a href="https://facebook.com/Kanmaniselvan.m" target="_blank">facebook</a>
+  🎨 & 🛠️ ~ @kanmaniselvan <span style="color: red">|></span> <a href="https://github.com/kanmaniselvan" target="_blank">github</a> | <a href="https://twitter.com/kanmaniselvan" target="_blank">twitter</a> | <a href="https://linkedin.com/in/kanmaniselvan" target="_blank">linkedIn</a> | <a href="https://facebook.com/Kanmaniselvan.m" target="_blank">facebook</a>
 </div>

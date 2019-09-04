@@ -12,7 +12,11 @@ body {
 
 .head-note h1:nth-child(1) {
   margin-top: 3%;
-  margin-bottom: 10%;
+  margin-bottom: 5%;
+}
+
+.board-select-cont button {
+  font-size: 1em;
 }
 
 .board-select-cont button:nth-child(1) {
@@ -35,7 +39,7 @@ body {
 }
 
 .board-select-cont {
-  margin: 10% 0;
+  margin: 8% 0;
 }
 
 #game-board table {
@@ -77,10 +81,32 @@ body {
 }
 
 .foot-note {
-  margin: 10% 0;
+  margin: 9% 0;
   color: bisque
 }
 
 .foot-note a {
   color: rgb(161, 161, 219);
+}
+
+.game-status {
+  margin-bottom: 2%
+}
+
+.won-cell {
+  color: #ffd9e2;
+  text-shadow: 0 0 0 transparent, 0 0 10px #ff003c, 0 0 20px rgba(255, 0, 60, 0.5), 0 0 40px #ff003c, 0 0 100px #ff003c, 0 0 200px #ff003c, 0 0 300px #ff003c, 0 0 500px #ff003c, 0 0 1000px #ff003c;
+  -webkit-animation: blink 4s infinite alternate;
+  animation: blink 4s infinite alternate;
+}
+
+.draw-game {
+  color: #ffd9e2;
+  text-shadow: 0 0 0 transparent, 0 0 10px #ffbb00, 0 0 20px rgba(255, 166, 0, 0.5), 0 0 40px #ffbb00, 0 0 100px #ffbb00, 0 0 200px #ffbb00, 0 0 300px #ffbb00, 0 0 500px #ffbb00, 0 0 1000px #ffbb00;
+  -webkit-animation: blink 4s infinite alternate;
+  animation: blink 4s infinite alternate;
+}
+
+.glow-button {
+  box-shadow: 0 0 6px 8px #0069d9;
 }
