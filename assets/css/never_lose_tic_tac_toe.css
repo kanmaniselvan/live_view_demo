@@ -3,7 +3,7 @@ body {
   color: #868686;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   text-align: center;
-  min-width: 800px;
+  min-width: 1000px;
 }
 
 .head-note span {
@@ -26,12 +26,19 @@ body {
 
 .board-select-cont button:nth-child(2) {
     border-radius: 0;
-    background: rgb(43, 0, 235);
-    border: rgb(43, 0, 235);
+    background: rgb(21, 56, 255);
+    border: rgb(21, 56, 255);
     margin-right: 10%; 
 }
 
 .board-select-cont button:nth-child(3) {
+    border-radius: 0;
+    background: rgb(53, 15, 223);
+    border: rgb(53, 15, 223);
+    margin-right: 10%; 
+}
+
+.board-select-cont button:nth-child(4) {
     border-radius: 0;
     background: rgb(30, 0, 165);
     border: rgb(30, 0, 165);
@@ -65,7 +72,7 @@ body {
   border: 1px solid #868686;
   display: inline-block;
   font-size: 4em;
-  color: azure;
+  color: #ffffff;
   font-weight: bold;
   text-align: center !important;
   padding: 0 !important;
@@ -102,11 +109,33 @@ body {
 
 .draw-game {
   color: #ffd9e2;
-  text-shadow: 0 0 0 transparent, 0 0 10px #ffbb00, 0 0 20px rgba(255, 166, 0, 0.5), 0 0 40px #ffbb00, 0 0 100px #ffbb00, 0 0 200px #ffbb00, 0 0 300px #ffbb00, 0 0 500px #ffbb00, 0 0 1000px #ffbb00;
+  text-shadow: 0 0 0 transparent, 0 0 10px #ff7300, 0 0 20px rgba(255, 166, 0, 0.5), 0 0 40px #ff7300, 0 0 100px #ff7300, 0 0 200px #ff7300, 0 0 300px #ff7300, 0 0 500px #ff7300, 0 0 1000px #ff7300;
   -webkit-animation: blink 4s infinite alternate;
   animation: blink 4s infinite alternate;
 }
 
-.glow-button {
+.shake-button {
   box-shadow: 0 0 6px 8px #0069d9;
+  animation: shake 0.82s cubic-bezier(.36,.07,.19,.97) both;
+  transform: translate3d(0, 0, 0);
+  backface-visibility: hidden;
+  perspective: 1000px;
+}
+
+@keyframes shake {
+  10%, 90% {
+    transform: translate3d(-1px, 0, 0);
+  }
+  
+  20%, 80% {
+    transform: translate3d(2px, 0, 0);
+  }
+
+  30%, 50%, 70% {
+    transform: translate3d(-4px, 0, 0);
+  }
+
+  40%, 60% {
+    transform: translate3d(4px, 0, 0);
+  }
 }

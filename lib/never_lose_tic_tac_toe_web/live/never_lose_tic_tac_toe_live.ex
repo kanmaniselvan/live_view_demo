@@ -26,12 +26,25 @@ defmodule NeverLoseTicTacToeWeb.NeverLoseTicTacToeLive do
     ~w(x x x x x x x)
   ]
 
+   @board_9_x_9 [
+    ~w(x x x x x x x x x),
+    ~w(x x x x x x x x x),
+    ~w(x x x x x x x x x),
+    ~w(x x x x x x x x x),
+    ~w(x x x x 0 x x x x),
+    ~w(x x x x x x x x x),
+    ~w(x x x x x x x x x),
+    ~w(x x x x x x x x x),
+    ~w(x x x x x x x x x)
+  ]
+
   defp board_select_html(:playing) do
     """
     <div class="board-select-cont">
       <button phx-click="board-size-choose" value="3x3">3 x 3</button>
       <button phx-click="board-size-choose" value="5x5">5 x 5</button>
       <button phx-click="board-size-choose" value="7x7">7 x 7</button>
+      <button phx-click="board-size-choose" value="9x9">9 x 9</button>
     </div>  
     """
   end
@@ -39,9 +52,10 @@ defmodule NeverLoseTicTacToeWeb.NeverLoseTicTacToeLive do
   defp board_select_html(_) do
     """
     <div class="board-select-cont">
-      <button class="glow-button" phx-click="board-size-choose" value="3x3">3 x 3</button>
-      <button class="glow-button" phx-click="board-size-choose" value="5x5">5 x 5</button>
-      <button class="glow-button" phx-click="board-size-choose" value="7x7">7 x 7</button>
+      <button class="shake-button" phx-click="board-size-choose" value="3x3">3 x 3</button>
+      <button class="shake-button" phx-click="board-size-choose" value="5x5">5 x 5</button>
+      <button class="shake-button" phx-click="board-size-choose" value="7x7">7 x 7</button>
+      <button class="shake-button" phx-click="board-size-choose" value="9x9">9 x 9</button>
     </div>  
     """
   end
@@ -111,6 +125,7 @@ defmodule NeverLoseTicTacToeWeb.NeverLoseTicTacToeLive do
   defp board_from_board_size("3x3"), do: @board_3_x_3
   defp board_from_board_size("5x5"), do: @board_5_x_5
   defp board_from_board_size("7x7"), do: @board_7_x_7
+  defp board_from_board_size("9x9"), do: @board_9_x_9
 
   defp build_board_html(board, game_state, won_cells) do
     {rows, _} =
