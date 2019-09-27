@@ -109,15 +109,16 @@ body {
 
 .draw-game {
   color: #ffd9e2;
-  text-shadow: 0 0 0 transparent, 0 0 10px #ff7300, 0 0 20px rgba(255, 166, 0, 0.5), 0 0 40px #ff7300, 0 0 100px #ff7300, 0 0 200px #ff7300, 0 0 300px #ff7300, 0 0 500px #ff7300, 0 0 1000px #ff7300;
+  text-shadow: 0 0 0 transparent, 0 0 10px #ffd900, 0 0 20px rgba(255, 251, 0, 0.5), 0 0 40px #ffd900, 0 0 100px #ffd900, 0 0 200px #ffd900, 0 0 300px #ffd900, 0 0 500px #ffd900, 0 0 1000px #ffd900;
   -webkit-animation: blink 4s infinite alternate;
   animation: blink 4s infinite alternate;
 }
 
 .shake-button {
   box-shadow: 0 0 6px 8px #0069d9;
-  animation: shake 0.82s cubic-bezier(.36,.07,.19,.97) both;
+  animation: shake 2s cubic-bezier(.36,.07,.19,.97) both;
   transform: translate3d(0, 0, 0);
+  animation-delay: .80s;
   backface-visibility: hidden;
   perspective: 1000px;
 }
