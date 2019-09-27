@@ -118,9 +118,25 @@ body {
   box-shadow: 0 0 6px 8px #0069d9;
   animation: shake 2s cubic-bezier(.36,.07,.19,.97) both;
   transform: translate3d(0, 0, 0);
-  animation-delay: .80s;
+  animation-delay: 1s;
   backface-visibility: hidden;
   perspective: 1000px;
+}
+
+.shake-button:nth-child(1) {
+  animation: shake .5s cubic-bezier(.36,.07,.19,.97) both;
+}
+
+.shake-button:nth-child(2) {
+  animation: shake 1s cubic-bezier(.36,.07,.19,.97) both;
+}
+
+.shake-button:nth-child(3) {
+  animation: shake 1.5s cubic-bezier(.36,.07,.19,.97) both;
+}
+
+.shake-button:nth-child(4) {
+  animation: shake 2s cubic-bezier(.36,.07,.19,.97) both;
 }
 
 @keyframes shake {
